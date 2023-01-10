@@ -143,6 +143,12 @@ func (c *Client) getMentionLinkByName(ctx context.Context, name string) (string,
 	for _, u := range users {
 		c.userCache[u.Name] = u
 	}
+	for _, u := range users {
+		if _, ok := c.userCache[u.Profile.DisplayName]; !ok {
+			c.userCache[u.Profile.DisplayName] = u
+		}
+	}
+
 	uc, ok := c.userCache[name]
 	if ok {
 		return fmt.Sprintf("<@%s>", uc.ID), nil
