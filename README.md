@@ -2,7 +2,11 @@
 
 slkm is `github.com/slack-go/slack` wrapper package for posting message.
 
-This package converts channels and mentions of users and user groups into the correct ID notation ( ex. `@username` -> `<@UXXXXXXXX>` ).
+This package converts channels and mentions of users and user groups into the correct ID notation.
+
+- `#channel-name` -> `CXXXXXXXX`
+- `@username` -> `<@UXXXXXXXX>`
+- `@usergroup-name` -> `<!subteam^SXXXXXXXX>`
 
 ## Usage
 
