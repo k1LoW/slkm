@@ -15,6 +15,10 @@ type Client struct {
 	channelCache   map[string]slack.Channel
 	userCache      map[string]slack.User
 	userGroupCache map[string]slack.UserGroup
+
+	username  string
+	iconEmoji string
+	iconURL   string
 }
 
 func New() (*Client, error) {
@@ -42,10 +46,32 @@ func (c *Client) PostMessage(ctx context.Context, channel string, blocks ...slac
 	opts := []slack.MsgOption{
 		slack.MsgOptionBlocks(blocks...),
 	}
+	if c.username != "" {
+		opts = append(opts, slack.MsgOptionUsername(c.username))
+	}
+	if c.iconEmoji != "" {
+		opts = append(opts, slack.MsgOptionIconEmoji(c.iconEmoji))
+	}
+	if c.iconURL != "" {
+		opts = append(opts, slack.MsgOptionIconURL(c.iconURL))
+	}
+
 	if _, _, err := c.client.PostMessageContext(ctx, channelID, opts...); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (c *Client) SetUsername(username string) {
+	c.username = username
+}
+
+func (c *Client) SetIconEmoji(emoji string) {
+	c.iconEmoji = emoji
+}
+
+func (c *Client) SetIconURL(u string) {
+	c.iconURL = u
 }
 
 func (c *Client) replaceBlockMentions(ctx context.Context, b slack.Block) error {
