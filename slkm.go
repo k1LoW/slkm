@@ -65,7 +65,7 @@ func (c *Client) replaceBlockMentions(ctx context.Context, b slack.Block) error 
 	return nil
 }
 
-var mentionRe = regexp.MustCompile(`@[\s@]+`)
+var mentionRe = regexp.MustCompile(`@[^\s@]+`)
 
 func (c *Client) replaceMentions(ctx context.Context, in string) string {
 	mentions := mentionRe.FindAllString(in, -1)
