@@ -74,7 +74,7 @@ func (c *Client) SetIconURL(u string) {
 	c.iconURL = u
 }
 
-func (c *Client) UpdateToken(token string) {
+func (c *Client) SetToken(token string) {
 	c.client = slack.New(token)
 }
 
