@@ -99,6 +99,10 @@ func (c *Client) SetWebhookURL(url string) {
 	c.webhookURL = url
 }
 
+func (c *Client) SlackClient() *slack.Client {
+	return c.client
+}
+
 var mentionRe = regexp.MustCompile(`@[^\s@]+`)
 
 // ReplaceMentionsToMentionLinks replace mentions ( `@k1low` ) to mention links ( `<@UXXXXXXX>` )
