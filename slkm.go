@@ -94,6 +94,10 @@ func (c *Client) SetToken(token string) {
 	c.client = slack.New(token)
 }
 
+func (c *Client) SetWebhookURL(url string) {
+	c.webhookURL = url
+}
+
 func (c *Client) replaceBlockMentions(ctx context.Context, b slack.Block) error {
 	switch v := b.(type) {
 	case *slack.HeaderBlock:
