@@ -48,7 +48,7 @@ func TestReplaceBlockMentions(t *testing.T) {
 
 }
 
-func TestReplaceMentions(t *testing.T) {
+func TestReplaceMentionsToMentionLinks(t *testing.T) {
 	if os.Getenv("SLACK_API_TOKEN") == "" {
 		t.Skip("not set SLACK_API_TOKEN")
 	}
@@ -66,7 +66,7 @@ func TestReplaceMentions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.in, func(t *testing.T) {
-			got := c.replaceMentions(ctx, tt.in)
+			got := c.ReplaceMentionsToMentionLinks(ctx, tt.in)
 			if !tt.wantRe.MatchString(got) {
 				t.Errorf("got %v\nwant %v", got, tt.wantRe.String())
 			}
@@ -74,7 +74,7 @@ func TestReplaceMentions(t *testing.T) {
 	}
 }
 
-func TestGetChannelIDByName(t *testing.T) {
+func TestFindChannelIDByName(t *testing.T) {
 	if os.Getenv("SLACK_API_TOKEN") == "" {
 		t.Skip("not set SLACK_API_TOKEN")
 	}
@@ -91,7 +91,7 @@ func TestGetChannelIDByName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.channel, func(t *testing.T) {
-			got, err := c.getChannelIDByName(ctx, tt.channel)
+			got, err := c.FindChannelIDByName(ctx, tt.channel)
 			if err != nil {
 				t.Error(err)
 			}
