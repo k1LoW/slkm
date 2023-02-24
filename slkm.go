@@ -37,6 +37,7 @@ func New() (*Client, error) {
 	return c, nil
 }
 
+// PostMessage to Slack channel
 func (c *Client) PostMessage(ctx context.Context, channel string, blocks ...slack.Block) error {
 	if c.token == "" && c.webhookURL != "" {
 		return slack.PostWebhookContext(ctx, c.webhookURL, &slack.WebhookMessage{
@@ -47,7 +48,7 @@ func (c *Client) PostMessage(ctx context.Context, channel string, blocks ...slac
 			Blocks:    &slack.Blocks{BlockSet: blocks},
 		})
 	}
-	channelID, err := c.getChannelIDByName(ctx, channel)
+	channelID, err := c.FindChannelIDByName(ctx, channel)
 	if err != nil {
 		return err
 	}
@@ -98,30 +99,14 @@ func (c *Client) SetWebhookURL(url string) {
 	c.webhookURL = url
 }
 
-func (c *Client) replaceBlockMentions(ctx context.Context, b slack.Block) error {
-	switch v := b.(type) {
-	case *slack.HeaderBlock:
-		if v.Text != nil {
-			v.Text.Text = c.replaceMentions(ctx, v.Text.Text)
-		}
-	case *slack.SectionBlock:
-		if v.Text != nil {
-			v.Text.Text = c.replaceMentions(ctx, v.Text.Text)
-		}
-		for _, f := range v.Fields {
-			f.Text = c.replaceMentions(ctx, f.Text)
-		}
-	}
-	return nil
-}
-
 var mentionRe = regexp.MustCompile(`@[^\s@]+`)
 
-func (c *Client) replaceMentions(ctx context.Context, in string) string {
+// ReplaceMentionsToMentionLinks replace mentions ( `@k1low` ) to mention links ( `<@UXXXXXXX>` )
+func (c *Client) ReplaceMentionsToMentionLinks(ctx context.Context, in string) string {
 	mentions := mentionRe.FindAllString(in, -1)
 	oldnew := []string{}
 	for _, m := range mentions {
-		l, err := c.getMentionLinkByName(ctx, m)
+		l, err := c.CreateMentionLinkFromName(ctx, m)
 		if err != nil {
 			continue
 		}
@@ -131,7 +116,8 @@ func (c *Client) replaceMentions(ctx context.Context, in string) string {
 	return rep.Replace(in)
 }
 
-func (c *Client) getChannelIDByName(ctx context.Context, channel string) (string, error) {
+// FindChannelIDByName find Channel ID ( `CXXXXXXX` ) by channel name ( `#general` )
+func (c *Client) FindChannelIDByName(ctx context.Context, channel string) (string, error) {
 	channel = strings.TrimPrefix(channel, "#")
 	if cc, ok := c.channelCache[channel]; ok {
 		return cc.ID, nil
@@ -170,7 +156,8 @@ L:
 	return cID, nil
 }
 
-func (c *Client) getMentionLinkByName(ctx context.Context, name string) (string, error) {
+// CreateMentionLinkFromName create mention link ( `<@UXXXXXXX>` ) from mention ( `@k1low` )
+func (c *Client) CreateMentionLinkFromName(ctx context.Context, name string) (string, error) {
 	name = strings.TrimPrefix(name, "@")
 	switch name {
 	case "channel", "here", "everyone":
@@ -217,4 +204,21 @@ func (c *Client) getMentionLinkByName(ctx context.Context, name string) (string,
 	}
 
 	return fmt.Sprintf("<@%s|not found user or usergroup>", name), nil
+}
+
+func (c *Client) replaceBlockMentions(ctx context.Context, b slack.Block) error {
+	switch v := b.(type) {
+	case *slack.HeaderBlock:
+		if v.Text != nil {
+			v.Text.Text = c.ReplaceMentionsToMentionLinks(ctx, v.Text.Text)
+		}
+	case *slack.SectionBlock:
+		if v.Text != nil {
+			v.Text.Text = c.ReplaceMentionsToMentionLinks(ctx, v.Text.Text)
+		}
+		for _, f := range v.Fields {
+			f.Text = c.ReplaceMentionsToMentionLinks(ctx, f.Text)
+		}
+	}
+	return nil
 }
