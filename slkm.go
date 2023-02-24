@@ -19,19 +19,34 @@ type Client struct {
 	username  string
 	iconEmoji string
 	iconURL   string
+
+	token      string
+	webhookURL string
 }
 
 func New() (*Client, error) {
+	token := os.Getenv("SLACK_API_TOKEN")
 	c := &Client{
-		client:         slack.New(os.Getenv("SLACK_API_TOKEN")),
+		client:         slack.New(token),
 		channelCache:   map[string]slack.Channel{},
 		userCache:      map[string]slack.User{},
 		userGroupCache: map[string]slack.UserGroup{},
+		token:          token,
+		webhookURL:     os.Getenv("SLACK_WEBHOOK_URL"),
 	}
 	return c, nil
 }
 
 func (c *Client) PostMessage(ctx context.Context, channel string, blocks ...slack.Block) error {
+	if c.token == "" && c.webhookURL != "" {
+		return slack.PostWebhookContext(ctx, c.webhookURL, &slack.WebhookMessage{
+			Username:  c.username,
+			IconEmoji: c.iconEmoji,
+			IconURL:   c.iconURL,
+			Channel:   channel,
+			Blocks:    &slack.Blocks{BlockSet: blocks},
+		})
+	}
 	channelID, err := c.getChannelIDByName(ctx, channel)
 	if err != nil {
 		return err
@@ -75,6 +90,7 @@ func (c *Client) SetIconURL(u string) {
 }
 
 func (c *Client) SetToken(token string) {
+	c.token = token
 	c.client = slack.New(token)
 }
 
