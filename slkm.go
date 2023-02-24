@@ -74,6 +74,10 @@ func (c *Client) SetIconURL(u string) {
 	c.iconURL = u
 }
 
+func (c *Client) UpdateToken(token string) {
+	c.client = slack.New(token)
+}
+
 func (c *Client) replaceBlockMentions(ctx context.Context, b slack.Block) error {
 	switch v := b.(type) {
 	case *slack.HeaderBlock:
