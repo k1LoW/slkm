@@ -1,5 +1,8 @@
 # Changelog
 
+## [v0.4.0](https://github.com/k1LoW/slkm/compare/v0.3.0...v0.4.0) (2024-09-02)
+
+
 ## [v0.3.0](https://github.com/k1LoW/slkm/compare/v0.2.0...v0.3.0) (2023-02-24)
 
 * Update pkgs [#6](https://github.com/k1LoW/slkm/pull/6) ([k1LoW](https://github.com/k1LoW))
