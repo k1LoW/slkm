@@ -26,13 +26,14 @@ type Client struct {
 
 func New() (*Client, error) {
 	token := os.Getenv("SLACK_API_TOKEN")
+	webhookURL := os.Getenv("SLACK_WEBHOOK_URL")
 	c := &Client{
 		client:         slack.New(token),
 		channelCache:   map[string]slack.Channel{},
 		userCache:      map[string]slack.User{},
 		userGroupCache: map[string]slack.UserGroup{},
 		token:          token,
-		webhookURL:     os.Getenv("SLACK_WEBHOOK_URL"),
+		webhookURL:     webhookURL,
 	}
 	return c, nil
 }
